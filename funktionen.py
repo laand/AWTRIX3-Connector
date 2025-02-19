@@ -13,6 +13,7 @@ import mysql.connector
 import psycopg2
 import requests
 import ephem
+import json
 
 # Lesen der Konfigurationsdatei
 config = configparser.ConfigParser()
@@ -49,7 +50,7 @@ def query_database(d_app, d_group, d_config):
             combined_data[key] = result
 
 
-        if flag == "crypto":
+        elif flag == "crypto":
             flag, info = d_config[d_group][key].split(",", 1)
             info = info.strip('"')
             currencies = info.split(',')
@@ -61,6 +62,21 @@ def query_database(d_app, d_group, d_config):
                 for i, value in enumerate(values):
                     key = f"{d_app}_{currency}_{i}"
                     combined_data[key] = value
+
+        elif flag == "webapi":
+           info = (info + ['', ''] * 3)[:7]
+           ip, endpoint, obj1, obj2, obj3, username, password = info
+        #   ip_port = ip
+        #   ip_url, port_url = ip_port.split(":")
+           # Erstellen der Abfrage
+           api_url = "http://" + ip + "/" + endpoint
+           # Ausführen der Abfrage
+           response = requests.get(api_url)
+            # Antwort als JSON
+           response = response.json()
+            # Ergebnis zum Daten-Dictionary hinzufügen
+           key = f"{d_app}_{endpoint}"
+           combined_data[key] = response[obj1][obj2][obj3]
 
         elif flag == "influxdb":
             info = (info + ['', ''] * 3)[:6]
