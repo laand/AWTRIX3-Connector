@@ -393,6 +393,8 @@ def awtrix3_send_request(url, request_data):
         # print("Erfolgreich gesendet: Statuscode =", response.status_code)
     except requests.exceptions.RequestException as e:
         print("Fehler beim Senden der Daten:", e)
+    except except requests.exceptions.ReadTimeout: as e:
+        print("Timeot beim Senden der Daten", e)
 
 
 def awtrix3_send_settings(url, settings_data):
